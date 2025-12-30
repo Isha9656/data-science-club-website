@@ -1,0 +1,39 @@
+import { createContext, useContext, useState } from "react";
+
+type Member = {
+  id: number;
+  name: string;
+  skills: string;
+  github: string;
+};
+
+const MembersContext = createContext<any>(null);
+
+export const MembersProvider = ({ children }: any) => {
+  const [members, setMembers] = useState<Member[]>([
+    {
+      id: 1,
+      name: "Aman",
+      skills: "Python, ML",
+      github: "https://github.com/aman",
+    },
+    {
+      id: 2,
+      name: "Riya",
+      skills: "Power BI, SQL",
+      github: "https://github.com/riya",
+    },
+  ]);
+
+  const addMember = (member: Member) => {
+    setMembers([...members, { ...member, id: Date.now() }]);
+  };
+
+  return (
+    <MembersContext.Provider value={{ members, addMember }}>
+      {children}
+    </MembersContext.Provider>
+  );
+};
+
+export const useMembers = () => useContext(MembersContext);
