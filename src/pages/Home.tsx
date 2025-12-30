@@ -24,6 +24,14 @@ export default function Home() {
         >
           Meet Our Members
         </Link>
+
+        <Link
+          to="/events"
+          className="border border-slate-600 text-slate-300 px-6 py-3 rounded-lg hover:bg-slate-800 transition"
+        >       
+          See Events
+        </Link>
+
       </div>
     </div>
   );

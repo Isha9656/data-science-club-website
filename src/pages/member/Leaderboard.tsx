@@ -9,18 +9,18 @@ export default function Leaderboard() {
     scores[a.user] = (scores[a.user] || 0) + 1;
   });
 
+  const ranked = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="flex min-h-screen bg-slate-950 text-slate-200">
       <Sidebar />
+      <div className="flex-1 p-10">
+        <h1 className="text-3xl font-bold mb-6">Leaderboard</h1>
 
-      <div style={{ flex: 1, padding: "40px" }}>
-        <h1>Leaderboard</h1>
-
-        {Object.keys(scores).length === 0 && <p>No rankings yet.</p>}
-
-        {Object.entries(scores).map(([user, score]) => (
-          <div key={user} style={{ padding: 10, borderBottom: "1px solid #ddd" }}>
-            {user} — {score} points
+        {ranked.map(([user, score], i) => (
+          <div key={user} className="bg-slate-900 p-4 rounded-xl mb-3 flex justify-between">
+            <span>#{i + 1} {user}</span>
+            <span className="text-cyan-400">{score} pts</span>
           </div>
         ))}
       </div>

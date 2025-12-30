@@ -1,19 +1,37 @@
 import Sidebar from "../../components/Sidebar";
+import { useEvents } from "../../context/EventContext";
+import { useAchievements } from "../../context/AchievementContext";
 
 export default function Dashboard() {
+  const { events } = useEvents();
+  const { achievements } = useAchievements();
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="flex min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200">
       <Sidebar />
+      <div className="flex-1 p-10">
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
-      <div style={{ flex: 1, padding: "40px" }}>
-        <h1>Member Dashboard</h1>
-        <p>Overview of your activity and growth in the Data Science Club.</p>
+        <div className="grid grid-cols-4 gap-6">
+          <div className="bg-gray-100 dark:bg-slate-900 p-6 rounded-xl">
+            <p>Total Events</p>
+            <p className="text-3xl text-cyan-500">{events.length}</p>
+          </div>
 
-        <div style={{ marginTop: 20 }}>
-          <p>✔ Events Joined</p>
-          <p>✔ Projects Built</p>
-          <p>✔ Achievements Earned</p>
-          <p>✔ Leaderboard Rank</p>
+          <div className="bg-gray-100 dark:bg-slate-900 p-6 rounded-xl">
+            <p>Achievements</p>
+            <p className="text-3xl text-cyan-500">{achievements.length}</p>
+          </div>
+
+          <div className="bg-gray-100 dark:bg-slate-900 p-6 rounded-xl">
+            <p>Status</p>
+            <p className="text-green-500">Active</p>
+          </div>
+
+          <div className="bg-gray-100 dark:bg-slate-900 p-6 rounded-xl">
+            <p>Rank</p>
+            <p className="text-cyan-500">#12</p>
+          </div>
         </div>
       </div>
     </div>

@@ -5,17 +5,14 @@ export default function Achievements() {
   const { achievements } = useAchievements();
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div className="flex min-h-screen bg-slate-950 text-slate-200">
       <Sidebar />
-
-      <div style={{ flex: 1, padding: "40px" }}>
-        <h1>Achievements</h1>
-
-        {achievements.length === 0 && <p>No achievements yet.</p>}
+      <div className="flex-1 p-10">
+        <h1 className="text-3xl font-bold mb-6">Achievements</h1>
 
         {achievements.map((a: any) => (
-          <div key={a.id} style={{ padding: 10, borderBottom: "1px solid #ddd" }}>
-            <strong>{a.user}</strong> – {a.name}
+          <div key={a.id} className="bg-slate-900 p-4 rounded-xl mb-3">
+            <strong className="text-cyan-400">{a.user}</strong> – {a.name}
           </div>
         ))}
       </div>

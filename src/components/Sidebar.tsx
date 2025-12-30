@@ -1,18 +1,32 @@
 import { Link } from "react-router-dom";
+import { useTheme } from "../context/ThemeContext";
 
 export default function Sidebar() {
-  return (
-    <div style={{ width: 200, background: "#f4f4f4", height: "100vh", padding: 20 }}>
-      <h3>DS Club</h3>
+  const { toggleTheme } = useTheme();
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <Link to="/app">Dashboard</Link>
-        <Link to="/app/events">Events</Link>
-        <Link to="/app/achievements">Achievements</Link>
-        <Link to="/app/leaderboard">Leaderboard</Link>
-        <Link to="/app/profile">Profile</Link>
-        <Link to="/app/directory" className="hover:text-cyan-400">Members</Link>
+  return (
+    <div className="w-56 min-h-screen bg-gray-200 dark:bg-slate-900 text-slate-900 dark:text-slate-200 p-5 flex flex-col justify-between">
+      <div>
+        <h2 className="text-xl font-bold text-cyan-500 mb-6">
+          DS Club
+        </h2>
+
+        <div className="flex flex-col gap-3">
+          <Link className="hover:text-cyan-500" to="/app">Dashboard</Link>
+          <Link className="hover:text-cyan-500" to="/app/events">Events</Link>
+          <Link className="hover:text-cyan-500" to="/app/achievements">Achievements</Link>
+          <Link className="hover:text-cyan-500" to="/app/leaderboard">Leaderboard</Link>
+          <Link className="hover:text-cyan-500" to="/app/profile">Profile</Link>
+          <Link className="hover:text-cyan-500" to="/app/directory">Members</Link>
+        </div>
       </div>
+
+      <button
+        onClick={toggleTheme}
+        className="bg-cyan-500 text-black py-2 rounded hover:bg-cyan-400 transition"
+      >
+        Toggle Theme
+      </button>
     </div>
   );
 }
