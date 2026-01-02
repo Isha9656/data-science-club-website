@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import logo from "../logo.png";
+import { authAPI } from "../utils/api";
 
 type AuthMode = "login" | "signup";
 type UserType = "member" | "committee" | null;
@@ -19,11 +20,16 @@ export default function Login() {
     confirmPassword: "",
   });
   const [errors, setErrors] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const [apiError, setApiError] = useState("");
 
   const validate = () => {
     const newErrors: any = {};
     const emailRegex = /^[a-zA-Z0-9._%+-]+@marwadiuniversity\.ac\.in$/;
     
+    if (mode === "signup" && !formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
     if (!emailRegex.test(formData.email)) {
       newErrors.email = "Email must be from marwadiuniversity.ac.in";
     }
@@ -38,14 +44,44 @@ export default function Login() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setApiError("");
     if (!validate()) return;
     
-    if (userType) {
-      login(userType === "committee" ? "admin" : userType);
-      if (userType === "committee") navigate("/admin");
-      else navigate("/app");
+    if (!userType) return;
+
+    setLoading(true);
+    const role = userType === "committee" ? "admin" : "member";
+    
+    try {
+      if (mode === "signup") {
+        // Register new user
+        await authAPI.register(formData.name, formData.email, formData.password, role);
+      } else {
+        // Login existing user
+        await authAPI.login(formData.email, formData.password, role);
+      }
+      
+      // Login will be handled by AuthContext
+      await login(role, formData.email, formData.password);
+      
+      // Navigate based on role
+      if (role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/app");
+      }
+    } catch (error: any) {
+      setApiError(error.message || "Authentication failed. Please try again.");
+      // Fallback to demo login if API fails and no credentials provided
+      if (!formData.email || !formData.password) {
+        await login(role);
+        if (role === "admin") navigate("/admin");
+        else navigate("/app");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -313,17 +349,24 @@ export default function Login() {
                 </div>
               )}
 
+              {apiError && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-3 text-red-400 text-sm">
+                  {apiError}
+                </div>
+              )}
+
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                disabled={loading}
+                whileHover={{ scale: loading ? 1 : 1.02 }}
+                whileTap={{ scale: loading ? 1 : 0.98 }}
                 className={`w-full h-12 bg-gradient-to-r ${
                   userType === "committee"
                     ? "from-indigo-500 to-purple-500"
                     : "from-cyan-500 to-blue-500"
-                } text-black font-bold rounded-xl shadow-lg hover:shadow-xl transition-all`}
+                } text-black font-bold rounded-xl shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
               >
-                {mode === "login" ? "Login" : "Sign Up"}
+                {loading ? "Processing..." : mode === "login" ? "Login" : "Sign Up"}
               </motion.button>
             </motion.form>
           )}

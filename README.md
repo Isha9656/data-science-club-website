@@ -1,46 +1,132 @@
-# Getting Started with Create React App
+# Data Science Club Website
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack web application for managing a Data Science Club, built with React (TypeScript) frontend and Node.js/Express/MongoDB backend.
+
+## Features
+
+- **Member Management**: View and manage club members
+- **Event Management**: Create and manage club events
+- **Achievements System**: Track and display member achievements
+- **User Profiles**: Member profiles with skills, GitHub, and contact info
+- **Admin Dashboard**: Administrative panel for managing all aspects of the club
+- **Authentication**: Secure login/registration system with role-based access
+
+## Tech Stack
+
+### Frontend
+- React 19 with TypeScript
+- React Router for navigation
+- Tailwind CSS for styling
+- Framer Motion for animations
+- Context API for state management
+
+### Backend
+- Node.js with Express
+- MongoDB with Mongoose
+- JWT for authentication
+- RESTful API architecture
+
+## Quick Start
+
+### Prerequisites
+- Node.js (v14 or higher)
+- MongoDB (local or MongoDB Atlas)
+
+### Setup Instructions
+
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd data-science-club-website
+   ```
+
+2. **Backend Setup**
+   ```bash
+   cd backend
+   npm install
+   ```
+   
+   Create a `.env` file:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/data-science-club
+   JWT_SECRET=your-secret-key
+   PORT=5000
+   ```
+   
+   Start the backend:
+   ```bash
+   npm run dev
+   ```
+
+3. **Frontend Setup**
+   ```bash
+   # From root directory
+   npm install
+   ```
+   
+   Create a `.env` file:
+   ```env
+   REACT_APP_API_URL=http://localhost:5000/api
+   ```
+   
+   Start the frontend:
+   ```bash
+   npm start
+   ```
+
+4. **Access the Application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:5000
+
+For detailed setup instructions, see [SETUP.md](./SETUP.md)
+
+## Project Structure
+
+```
+data-science-club-website/
+├── backend/              # Express backend server
+│   ├── config/          # Database configuration
+│   ├── models/          # Mongoose models
+│   ├── routes/          # API routes
+│   ├── middleware/      # Auth middleware
+│   └── server.js        # Entry point
+├── src/                 # React frontend
+│   ├── components/      # Reusable components
+│   ├── context/         # Context providers
+│   ├── pages/           # Page components
+│   ├── utils/           # Utility functions (API)
+│   └── layouts/         # Layout components
+└── public/              # Static assets
+```
 
 ## Available Scripts
 
-In the project directory, you can run:
+### Frontend
+- `npm start` - Runs the app in development mode
+- `npm test` - Launches the test runner
+- `npm run build` - Builds the app for production
 
-### `npm start`
+### Backend
+- `npm start` - Runs the server in production mode
+- `npm run dev` - Runs the server with nodemon (auto-reload)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## API Documentation
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+See [backend/README.md](./backend/README.md) for detailed API documentation.
 
-### `npm test`
+## Environment Variables
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Backend (.env)
+- `MONGODB_URI` - MongoDB connection string
+- `JWT_SECRET` - Secret key for JWT tokens
+- `PORT` - Server port (default: 5000)
 
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Frontend (.env)
+- `REACT_APP_API_URL` - Backend API URL
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- [React Documentation](https://reactjs.org/)
+- [Express Documentation](https://expressjs.com/)
+- [MongoDB Documentation](https://docs.mongodb.com/)
+- [Mongoose Documentation](https://mongoosejs.com/)
