@@ -5,6 +5,10 @@ type Member = {
   name: string;
   skills: string;
   github: string;
+  email?: string;
+  phone?: string;
+  course?: string;
+  year?: string;
 };
 
 const MembersContext = createContext<any>(null);
@@ -16,12 +20,20 @@ export const MembersProvider = ({ children }: any) => {
       name: "Aman",
       skills: "Python, ML",
       github: "https://github.com/aman",
+      email: "aman@marwadiuniversity.ac.in",
+      phone: "+91 98765 43210",
+      course: "B.Tech Data Science",
+      year: "3rd Year",
     },
     {
       id: 2,
       name: "Riya",
       skills: "Power BI, SQL",
       github: "https://github.com/riya",
+      email: "riya@marwadiuniversity.ac.in",
+      phone: "+91 98765 43211",
+      course: "B.Tech Data Science",
+      year: "2nd Year",
     },
   ]);
 

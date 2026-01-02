@@ -3,26 +3,24 @@ import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
 import logo from "../logo.png";
 
-const navItems = [
-  { to: "/app", label: "Dashboard" },
-  { to: "/app/events", label: "Events" },
-  { to: "/app/achievements", label: "Achievements" },
-  { to: "/app/leaderboard", label: "Leaderboard" },
-  { to: "/app/profile", label: "Profile" },
-  { to: "/app/directory", label: "Directory" },
-  { to: "/app/analytics", label: "Analytics" },
+const nav = [
+  { to: "/admin", label: "Overview" },
+  { to: "/admin/events", label: "Manage Events" },
+  { to: "/admin/members", label: "Members" },
+  { to: "/admin/achievements", label: "Achievements" },
 ];
 
-export default function MemberLayout() {
+export default function AdminLayout() {
   const { logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const navLocation = useLocation();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  const isActive = (path: string) => location.pathname === path;
+  const active = (path: string) => navLocation.pathname === path;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white flex transition-colors">
+    <div className="min-h-screen flex bg-white dark:bg-slate-950 text-slate-900 dark:text-white transition-colors">
+      {/* Sidebar */}
       <aside className="w-64 bg-slate-100 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 p-4 md:p-6">
         <button
           onClick={() => {
@@ -32,15 +30,15 @@ export default function MemberLayout() {
           className="flex items-center gap-3 text-xl font-bold mb-8 block hover:text-cyan-500 transition-colors cursor-pointer text-left w-full"
         >
           <img src={logo} alt="Logo" className="w-8 h-8" />
-          <span>DS Club</span>
+          <span>Committee</span>
         </button>
         <nav className="space-y-2">
-          {navItems.map((n) => (
+          {nav.map((n) => (
             <Link
               key={n.to}
               to={n.to}
               className={`block px-4 py-2 rounded ${
-                isActive(n.to)
+                active(n.to)
                   ? "bg-slate-200 dark:bg-slate-800"
                   : "hover:bg-slate-200 dark:hover:bg-slate-800"
               }`}
@@ -51,8 +49,9 @@ export default function MemberLayout() {
         </nav>
       </aside>
 
+      {/* Main */}
       <div className="flex-1 flex flex-col">
-        <header className="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center px-6 gap-4">
+        <header className="h-16 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center px-6 gap-4">
           <Link
             to="/login"
             className="text-cyan-500 hover:text-cyan-400 text-sm font-medium flex items-center gap-2 transition-colors"
@@ -78,7 +77,7 @@ export default function MemberLayout() {
           </div>
         </header>
 
-        <main className="flex-1 bg-slate-50 dark:bg-slate-950 p-6 md:p-10 lg:p-12">
+        <main className="flex-1 p-6 md:p-10 lg:p-12 bg-slate-50 dark:bg-slate-950">
           <Outlet />
         </main>
       </div>

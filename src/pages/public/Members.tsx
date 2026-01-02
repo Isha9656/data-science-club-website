@@ -1,33 +1,92 @@
+import { motion } from "framer-motion";
 import { useMembers } from "../../context/MembersContext";
 import PublicNavbar from "../../components/PublicNavbar";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+    },
+  },
+};
 
 export default function Members() {
   const { members } = useMembers();
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-200">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-200">
       <PublicNavbar />
 
-      <div className="p-10">
-        <h1 className="text-4xl font-bold text-cyan-500 mb-8">
-          Our Members
-        </h1>
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="max-w-7xl mx-auto px-6 md:px-10 lg:px-16 py-12 md:py-16 lg:py-20"
+      >
+        <motion.div variants={itemVariants} className="text-center mb-12 md:mb-16">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent mb-4">
+            Our Members
+          </h1>
+          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            Meet the talented data scientists, ML engineers, and researchers
+            driving innovation in our community.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-3 gap-6">
-          {members.map((m: any) => (
-            <div
+        <motion.div
+          variants={itemVariants}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+        >
+          {members.map((m: any, index: number) => (
+            <motion.div
               key={m.id}
-              className="bg-gray-100 dark:bg-slate-900 p-6 rounded-xl shadow"
+              variants={itemVariants}
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 hover:shadow-xl hover:border-cyan-400/50 transition-all"
             >
-              <h2 className="text-lg font-semibold">{m.name}</h2>
-              <p className="text-slate-400">{m.skills}</p>
-              <a className="text-blue-500" href={m.github}>
-                GitHub
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-cyan-400 via-blue-500 to-indigo-500 flex items-center justify-center text-black font-black text-xl md:text-2xl shadow-lg">
+                  {m.name?.charAt(0)}
+                </div>
+                <div>
+                  <h2 className="text-lg md:text-xl font-bold">{m.name}</h2>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    {m.course || "Club Member"}
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm md:text-base text-slate-600 dark:text-slate-400 mb-4">
+                {m.skills}
+              </p>
+              <a
+                href={m.github}
+                target="_blank"
+                rel="noreferrer"
+                className="text-cyan-500 hover:text-cyan-400 font-semibold text-sm md:text-base inline-flex items-center gap-2"
+              >
+                View GitHub →
               </a>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

@@ -4,7 +4,7 @@ import Login from "./pages/Login";
 import Members from "./pages/public/Members";
 import Events from "./pages/public/Events";
 
-// Member Routes
+// Member
 import Dashboard from "./pages/member/Dashboard";
 import MyEvents from "./pages/member/MyEvents";
 import Achievements from "./pages/member/Achievements";
@@ -15,20 +15,29 @@ import Analytics from "./pages/member/Analytics";
 
 // Layouts
 import MemberLayout from "./layouts/MemberLayout";
+import AdminLayout from "./layouts/AdminLayout";
+
+// Admin
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import EventsAdmin from "./pages/admin/EventsAdmin";
+import MembersAdmin from "./pages/admin/MembersAdmin";
+import AchievementsAdmin from "./pages/admin/AchievementsAdmin";
+
+// Auth
 import ProtectedRoute from "./components/ProtectedRoute";
 
 export default function App() {
   return (
     <Routes>
-      {/* Public Routes */}
+      {/* Public */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/members" element={<Members />} />
       <Route path="/events" element={<Events />} />
 
-      {/* Member Protected Routes */}
-      <Route 
-        path="/app" 
+      {/* Member */}
+      <Route
+        path="/app"
         element={
           <ProtectedRoute role="member">
             <MemberLayout />
@@ -42,6 +51,21 @@ export default function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="directory" element={<Directory />} />
         <Route path="analytics" element={<Analytics />} />
+      </Route>
+
+      {/* Admin */}
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="events" element={<EventsAdmin />} />
+        <Route path="members" element={<MembersAdmin />} />
+        <Route path="achievements" element={<AchievementsAdmin />} />
       </Route>
     </Routes>
   );

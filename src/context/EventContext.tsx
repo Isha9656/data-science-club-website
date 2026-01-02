@@ -15,8 +15,16 @@ export const EventProvider = ({ children }: any) => {
     setEvents([...events, { id: Date.now(), title, date }]);
   };
 
+  const updateEvent = (id: number, title: string, date: string) => {
+    setEvents(events.map(e => e.id === id ? { id, title, date } : e));
+  };
+
+  const deleteEvent = (id: number) => {
+    setEvents(events.filter(e => e.id !== id));
+  };
+
   return (
-    <EventContext.Provider value={{ events, addEvent }}>
+    <EventContext.Provider value={{ events, addEvent, updateEvent, deleteEvent }}>
       {children}
     </EventContext.Provider>
   );
