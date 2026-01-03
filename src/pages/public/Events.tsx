@@ -77,15 +77,26 @@ export default function Events() {
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 md:p-8 hover:shadow-xl hover:border-cyan-400/50 transition-all"
+                className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl hover:border-cyan-400/50 transition-all group"
               >
-                <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center text-2xl mb-4">
-                  📅
+                {e.image ? (
+                  <div className="h-48 w-full overflow-hidden relative mb-4">
+                    <img src={e.image} alt={e.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent" />
+                  </div>
+                ) : (
+                    <div className="p-6 md:p-8 pb-0">
+                        <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-xl flex items-center justify-center text-2xl mb-4">
+                        📅
+                        </div>
+                    </div>
+                )}
+                <div className="p-6 md:p-8 pt-0">
+                    <h2 className="text-xl md:text-2xl font-bold mb-3">{e.title}</h2>
+                    <p className="text-slate-600 dark:text-slate-400">
+                    {formatDate(e.date)}
+                    </p>
                 </div>
-                <h2 className="text-xl md:text-2xl font-bold mb-3">{e.title}</h2>
-                <p className="text-slate-600 dark:text-slate-400">
-                  {formatDate(e.date)}
-                </p>
               </motion.div>
             ))}
           </motion.div>

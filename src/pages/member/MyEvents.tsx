@@ -158,8 +158,15 @@ export default function MyEvents() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
-                className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 hover:shadow-xl transition-all group"
+                className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl transition-all group"
               >
+                {e.image && (
+                  <div className="h-48 w-full overflow-hidden relative">
+                    <img src={e.image} alt={e.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  </div>
+                )}
+                <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
@@ -223,6 +230,7 @@ export default function MyEvents() {
                       {isJoined ? "✓ Joined" : "Join Event"}
                     </motion.button>
                   </div>
+                </div>
                 </div>
               </motion.div>
             );

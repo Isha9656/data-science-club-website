@@ -186,13 +186,13 @@ export default function Login() {
                   icon: "👤",
                   gradient: "from-cyan-500 to-blue-500",
                 },
-                {
+                ...(mode === "login" ? [{
                   type: "committee" as const,
                   title: "Committee",
                   subtitle: "Admin dashboard & management",
                   icon: "👔",
                   gradient: "from-indigo-500 to-purple-500",
-                },
+                }] : []),
               ].map((option) => (
                 <motion.button
                   key={option.type}

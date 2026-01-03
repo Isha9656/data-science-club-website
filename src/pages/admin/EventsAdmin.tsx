@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useEvents } from "../../context/EventContext";
 import { Link } from "react-router-dom";
 
@@ -27,9 +27,10 @@ const itemVariants = {
 export default function EventsAdmin() {
   const { events, addEvent, updateEvent, deleteEvent } = useEvents();
   const [isEditing, setIsEditing] = useState<number | null>(null);
-  const [formData, setFormData] = useState({ title: "", date: "" });
+  const [formData, setFormData] = useState({ title: "", date: "", image: "" });
   const [showForm, setShowForm] = useState(false);
   const [errors, setErrors] = useState<any>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const validate = () => {
     const newErrors: any = {};
@@ -39,22 +40,33 @@ export default function EventsAdmin() {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
     if (isEditing) {
-      updateEvent(isEditing, formData.title, formData.date);
+      updateEvent(isEditing, formData.title, formData.date, formData.image);
       setIsEditing(null);
     } else {
-      addEvent(formData.title, formData.date);
+      addEvent(formData.title, formData.date, formData.image);
     }
-    setFormData({ title: "", date: "" });
+    setFormData({ title: "", date: "", image: "" });
     setShowForm(false);
   };
 
   const handleEdit = (event: any) => {
     setIsEditing(event.id);
-    setFormData({ title: event.title, date: event.date });
+    setFormData({ title: event.title, date: event.date, image: event.image || "" });
     setShowForm(true);
   };
 
@@ -66,7 +78,7 @@ export default function EventsAdmin() {
 
   const handleCancel = () => {
     setIsEditing(null);
-    setFormData({ title: "", date: "" });
+    setFormData({ title: "", date: "", image: "" });
     setShowForm(false);
   };
 
@@ -92,7 +104,7 @@ export default function EventsAdmin() {
           onClick={() => {
             setShowForm(true);
             setIsEditing(null);
-            setFormData({ title: "", date: "" });
+            setFormData({ title: "", date: "", image: "" });
           }}
           className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
         >
@@ -112,50 +124,74 @@ export default function EventsAdmin() {
               {isEditing ? "Edit Event" : "Create New Event"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2 font-medium">
-                  Event Title
-                </label>
-                <input
-                  type="text"
-                  value={formData.title}
-                  onChange={(e) => {
-                    setFormData({ ...formData, title: e.target.value });
-                    if (errors.title) setErrors({ ...errors, title: "" });
-                  }}
-                  className={`w-full bg-slate-50 dark:bg-slate-950 border ${
-                    errors.title ? "border-red-500" : "border-slate-200 dark:border-slate-800"
-                  } rounded-xl p-4 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition text-lg`}
-                  placeholder="Enter event title"
-                />
-                {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+              <div className="flex gap-8">
+                  {/* Image Upload Section */}
+                  <div className="flex-shrink-0">
+                      <div 
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-40 h-40 bg-slate-100 dark:bg-slate-900 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl flex items-center justify-center cursor-pointer hover:border-cyan-500 transition-colors overflow-hidden relative group"
+                      >
+                          {formData.image ? (
+                              <img src={formData.image} alt="Event Poster" className="w-full h-full object-cover" />
+                          ) : (
+                              <div className="text-center p-4">
+                                  <span className="text-2xl mb-2 block">🖼️</span>
+                                  <span className="text-xs text-slate-500">Upload Poster</span>
+                              </div>
+                          )}
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <span className="text-white text-xs font-bold">Change</span>
+                          </div>
+                      </div>
+                      <input 
+                          type="file" 
+                          ref={fileInputRef}
+                          className="hidden" 
+                          accept="image/*"
+                          onChange={handleImageChange}
+                      />
+                  </div>
+                  
+                  <div className="flex-1 space-y-5">
+                    <div>
+                        <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2 font-medium">
+                        Event Title
+                        </label>
+                        <input
+                        type="text"
+                        value={formData.title}
+                        onChange={(e) => {
+                            setFormData({ ...formData, title: e.target.value });
+                            if (errors.title) setErrors({ ...errors, title: "" });
+                        }}
+                        className={`w-full bg-slate-50 dark:bg-slate-950 border ${
+                            errors.title ? "border-red-500" : "border-slate-200 dark:border-slate-800"
+                        } rounded-xl p-4 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition text-lg`}
+                        placeholder="Enter event title"
+                        />
+                        {errors.title && <p className="text-red-500 text-sm mt-1">{errors.title}</p>}
+                    </div>
+                    <div>
+                        <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2 font-medium">
+                        Event Date
+                        </label>
+                        <input
+                        type="date"
+                        value={formData.date}
+                        onChange={(e) => {
+                            setFormData({ ...formData, date: e.target.value });
+                            if (errors.date) setErrors({ ...errors, date: "" });
+                        }}
+                        className={`w-full bg-slate-50 dark:bg-slate-950 border ${
+                            errors.date ? "border-red-500" : "border-slate-200 dark:border-slate-800"
+                        } rounded-xl p-4 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition text-lg`}
+                        />
+                        {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
+                    </div>
+                  </div>
               </div>
-              <div>
-                <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2 font-medium">
-                  Event Date
-                </label>
-                <input
-                  type="date"
-                  value={formData.date}
-                  onChange={(e) => {
-                    setFormData({ ...formData, date: e.target.value });
-                    if (errors.date) setErrors({ ...errors, date: "" });
-                  }}
-                  className={`w-full bg-slate-50 dark:bg-slate-950 border ${
-                    errors.date ? "border-red-500" : "border-slate-200 dark:border-slate-800"
-                  } rounded-xl p-4 focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500 outline-none transition text-lg`}
-                />
-                {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
-              </div>
-              <div className="flex gap-4">
-                <motion.button
-                  type="submit"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
-                >
-                  {isEditing ? "Update Event" : "Create Event"}
-                </motion.button>
+              
+              <div className="flex gap-4 justify-end">
                 <motion.button
                   type="button"
                   whileHover={{ scale: 1.05 }}
@@ -164,6 +200,14 @@ export default function EventsAdmin() {
                   className="bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white px-8 py-3 rounded-xl font-bold hover:bg-slate-300 dark:hover:bg-slate-700 transition-all"
                 >
                   Cancel
+                </motion.button>
+                <motion.button
+                  type="submit"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                >
+                  {isEditing ? "Update Event" : "Create Event"}
                 </motion.button>
               </div>
             </form>
@@ -196,11 +240,15 @@ export default function EventsAdmin() {
                 whileHover={{ x: 10 }}
                 className="p-6 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div>
+                <div className="flex items-center gap-6">
+                    {event.image && (
+                        <img src={event.image} alt={event.title} className="w-16 h-16 rounded-xl object-cover shadow-sm" />
+                    )}
+                  <div className="flex-1">
                     <h3 className="text-xl font-bold">{event.title}</h3>
-                    <p className="text-slate-600 dark:text-slate-400 mt-1">
-                      {new Date(event.date).toLocaleDateString("en-US", {
+                    <p className="text-slate-600 dark:text-slate-400">
+                      {new Date(event.date).toLocaleDateString(undefined, {
+                        weekday: "long",
                         year: "numeric",
                         month: "long",
                         day: "numeric",
@@ -208,22 +256,20 @@ export default function EventsAdmin() {
                     </p>
                   </div>
                   <div className="flex gap-3">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                    <button
                       onClick={() => handleEdit(event)}
-                      className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-2.5 rounded-xl font-bold hover:shadow-lg transition-all"
+                      className="p-2 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                      title="Edit"
                     >
-                      Edit
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
+                      ✏️
+                    </button>
+                    <button
                       onClick={() => handleDelete(event.id)}
-                      className="bg-gradient-to-r from-red-500 to-rose-500 text-white px-6 py-2.5 rounded-xl font-bold hover:shadow-lg transition-all"
+                      className="p-2 hover:bg-red-100 dark:hover:bg-red-900/30 rounded-lg transition-colors text-red-500"
+                      title="Delete"
                     >
-                      Delete
-                    </motion.button>
+                      🗑️
+                    </button>
                   </div>
                 </div>
               </motion.div>

@@ -4,6 +4,7 @@ type Event = {
   id: number;
   title: string;
   date: string;
+  image?: string;
 };
 
 const EventContext = createContext<any>(null);
@@ -11,12 +12,12 @@ const EventContext = createContext<any>(null);
 export const EventProvider = ({ children }: any) => {
   const [events, setEvents] = useState<Event[]>([]);
 
-  const addEvent = (title: string, date: string) => {
-    setEvents([...events, { id: Date.now(), title, date }]);
+  const addEvent = (title: string, date: string, image?: string) => {
+    setEvents([...events, { id: Date.now(), title, date, image }]);
   };
 
-  const updateEvent = (id: number, title: string, date: string) => {
-    setEvents(events.map(e => e.id === id ? { id, title, date } : e));
+  const updateEvent = (id: number, title: string, date: string, image?: string) => {
+    setEvents(events.map(e => e.id === id ? { id, title, date, image } : e));
   };
 
   const deleteEvent = (id: number) => {
