@@ -10,6 +10,7 @@ const navItems = [
   { to: "/app/leaderboard", label: "Leaderboard" },
   { to: "/app/profile", label: "Profile" },
   { to: "/app/directory", label: "Directory" },
+  { to: "/app/gallery", label: "Gallery" },
   { to: "/app/analytics", label: "Analytics" },
 ];
 

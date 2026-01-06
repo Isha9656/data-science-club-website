@@ -293,6 +293,24 @@ export default function Home() {
           </div>
         </motion.div>
       </div>
+
+      {/* FOOTER */}
+      <footer className="relative z-10 bg-slate-900 border-t border-slate-800 py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="DS Club" className="w-10 h-10 opacity-80" />
+            <p className="text-slate-500 text-sm">
+              © {new Date().getFullYear()} Data Science Club. All rights reserved.
+            </p>
+          </div>
+          <div className="flex gap-6 text-slate-500">
+            <a href="#" className="hover:text-cyan-400 transition-colors">Twitter</a>
+            <a href="#" className="hover:text-cyan-400 transition-colors">LinkedIn</a>
+            <a href="#" className="hover:text-cyan-400 transition-colors">GitHub</a>
+            <a href="#" className="hover:text-cyan-400 transition-colors">Instagram</a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

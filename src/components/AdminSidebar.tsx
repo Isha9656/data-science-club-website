@@ -11,8 +11,17 @@ export default function AdminSidebar() {
         <Link className="hover:text-cyan-500" to="/admin">
           Dashboard
         </Link>
+        <Link className="hover:text-cyan-500" to="/admin/events">
+          Events
+        </Link>
         <Link className="hover:text-cyan-500" to="/admin/members">
           Members
+        </Link>
+        <Link className="hover:text-cyan-500" to="/admin/gallery">
+          Gallery
+        </Link>
+        <Link className="hover:text-cyan-500" to="/admin/achievements">
+          Achievements
         </Link>
       </nav>
     </div>

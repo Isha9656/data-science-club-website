@@ -42,13 +42,14 @@ export default function Profile() {
   const validate = () => {
     const newErrors: any = {};
     const emailRegex = /^[a-zA-Z0-9._%+-]+@marwadiuniversity\.ac\.in$/;
-    const phoneRegex = /^\d{10}$/;
+    // Allow +91, spaces, dashes, or just 10 digits
+    const phoneRegex = /^(\+91[\-\s]?)?[0-9]{10}$/;
     const nameRegex = /^[a-zA-Z\s]+$/;
     const urlRegex = /^https?:\/\/.+/;
 
     if (!nameRegex.test(name)) newErrors.name = "Name must contain only letters";
-    if (!emailRegex.test(email)) newErrors.email = "Email must be from marwadiuniversity.ac.in";
-    if (!phoneRegex.test(phone)) newErrors.phone = "Phone must be exactly 10 digits";
+    if (email && !emailRegex.test(email)) newErrors.email = "Email must be from marwadiuniversity.ac.in";
+    if (phone && !phoneRegex.test(phone.replace(/\s+/g, ''))) newErrors.phone = "Phone must be valid (10 digits)";
     if (github && !urlRegex.test(github)) newErrors.github = "Invalid URL (must start with http/https)";
     
     setErrors(newErrors);

@@ -13,6 +13,9 @@ import Profile from "./pages/member/Profile";
 import Directory from "./pages/member/Directory";
 import Analytics from "./pages/member/Analytics";
 
+// Shared
+import Gallery from "./pages/shared/Gallery";
+
 // Layouts
 import MemberLayout from "./layouts/MemberLayout";
 import AdminLayout from "./layouts/AdminLayout";
@@ -51,6 +54,7 @@ export default function App() {
         <Route path="profile" element={<Profile />} />
         <Route path="directory" element={<Directory />} />
         <Route path="analytics" element={<Analytics />} />
+        <Route path="gallery" element={<Gallery />} />
       </Route>
 
       {/* Admin */}
@@ -65,6 +69,7 @@ export default function App() {
         <Route index element={<AdminDashboard />} />
         <Route path="events" element={<EventsAdmin />} />
         <Route path="members" element={<MembersAdmin />} />
+        <Route path="gallery" element={<Gallery />} />
         <Route path="achievements" element={<AchievementsAdmin />} />
       </Route>
     </Routes>

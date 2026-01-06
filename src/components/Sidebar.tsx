@@ -18,6 +18,7 @@ export default function Sidebar() {
           <Link className="hover:text-cyan-500" to="/app/leaderboard">Leaderboard</Link>
           <Link className="hover:text-cyan-500" to="/app/profile">Profile</Link>
           <Link className="hover:text-cyan-500" to="/app/directory">Members</Link>
+          <Link className="hover:text-cyan-500" to="/app/gallery">Gallery</Link>
           <Link className="hover:text-cyan-500" to="/app/analytics">Analytics</Link>
 
         </div>

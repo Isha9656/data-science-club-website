@@ -7,6 +7,7 @@ const nav = [
   { to: "/admin", label: "Overview" },
   { to: "/admin/events", label: "Manage Events" },
   { to: "/admin/members", label: "Members" },
+  { to: "/admin/gallery", label: "Gallery" },
   { to: "/admin/achievements", label: "Achievements" },
 ];
 

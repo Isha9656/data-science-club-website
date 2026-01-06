@@ -169,37 +169,37 @@ export default function Login() {
           </p>
         </motion.div>
 
-        {/* Mode Toggle */}
-        <div className="flex gap-2 mb-6 bg-slate-800/50 p-1 rounded-xl">
-          <button
-            onClick={() => {
-              setMode("login");
-              setUserType(null);
-              setErrors({});
-            }}
-            className={`flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all ${
-              mode === "login"
-                ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black shadow-lg"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            Login
-          </button>
-          <button
-            onClick={() => {
-              setMode("signup");
-              setUserType(null);
-              setErrors({});
-            }}
-            className={`flex-1 py-2.5 px-4 rounded-lg font-semibold transition-all ${
-              mode === "signup"
-                ? "bg-gradient-to-r from-cyan-500 to-blue-500 text-black shadow-lg"
-                : "text-slate-400 hover:text-white"
-            }`}
-          >
-            Sign Up
-          </button>
-        </div>
+        {/* Auth Mode Toggle */}
+        {userType === "member" && (
+          <div className="flex bg-slate-800/50 p-1 rounded-xl mb-8">
+            <button
+              onClick={() => setMode("login")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                mode === "login"
+                  ? "bg-cyan-500 text-white shadow-lg"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              Login
+            </button>
+            <button
+              onClick={() => setMode("signup")}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                mode === "signup"
+                  ? "bg-cyan-500 text-white shadow-lg"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              Sign Up
+            </button>
+          </div>
+        )}
+
+        {userType === "committee" && (
+          <div className="mb-8 text-center">
+             <p className="text-slate-400 text-sm">Committee Member Login</p>
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           {!userType ? (

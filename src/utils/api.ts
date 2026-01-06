@@ -105,7 +105,7 @@ export const eventsAPI = {
   getById: async (id: string) => {
     return apiRequest<any>(`/events/${id}`);
   },
-  create: async (event: { title: string; date: string; description?: string }) => {
+  create: async (event: any) => {
     return apiRequest<any>('/events', {
       method: 'POST',
       body: JSON.stringify(event),
@@ -129,13 +129,7 @@ export const achievementsAPI = {
   getAll: async () => {
     return apiRequest<any[]>('/achievements');
   },
-  getById: async (id: string) => {
-    return apiRequest<any>(`/achievements/${id}`);
-  },
-  getByUserId: async (userId: string) => {
-    return apiRequest<any[]>(`/achievements/user/${userId}`);
-  },
-  create: async (achievement: { name: string; user: string; description?: string; date?: string }) => {
+  create: async (achievement: any) => {
     return apiRequest<any>('/achievements', {
       method: 'POST',
       body: JSON.stringify(achievement),
@@ -157,13 +151,31 @@ export const achievementsAPI = {
 // Profile API
 export const profileAPI = {
   getMe: async () => {
-    return apiRequest<any>('/profile/me');
+    return apiRequest<any>('/profile');
   },
   update: async (profile: any) => {
-    return apiRequest<any>('/profile/me', {
+    return apiRequest<any>('/profile', {
       method: 'PUT',
       body: JSON.stringify(profile),
     });
   },
 };
 
+// Gallery API
+export const galleryAPI = {
+  getAll: async (category?: string) => {
+    const query = category ? `?category=${category}` : '';
+    return apiRequest<any[]>(`/gallery${query}`);
+  },
+  create: async (item: { title: string; imageUrl: string; category: string; date?: Date }) => {
+    return apiRequest<any>('/gallery', {
+      method: 'POST',
+      body: JSON.stringify(item),
+    });
+  },
+  delete: async (id: string) => {
+    return apiRequest<{ message: string }>(`/gallery/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
