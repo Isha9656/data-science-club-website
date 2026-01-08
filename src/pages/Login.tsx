@@ -56,30 +56,18 @@ export default function Login() {
     
     try {
       if (mode === "signup") {
-        // Register new user
         await authAPI.register(formData.name, formData.email, formData.password, role);
-      } else {
-        // Login existing user
-        await authAPI.login(formData.email, formData.password, role);
       }
-      
-      // Login will be handled by AuthContext
-      await login(role, formData.email, formData.password);
-      
-      // Navigate based on role
+
+      await login(formData.email, formData.password);
+
       if (role === "admin") {
-        navigate("/admin");
+        navigate("/admin/dashboard");
       } else {
-        navigate("/app");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       setApiError(error.message || "Authentication failed. Please try again.");
-      // Fallback to demo login if API fails and no credentials provided
-      if (!formData.email || !formData.password) {
-        await login(role);
-        if (role === "admin") navigate("/admin");
-        else navigate("/app");
-      }
     } finally {
       setLoading(false);
     }

@@ -4,7 +4,7 @@ import { useTheme } from "../context/ThemeContext";
 import logo from "../logo.png";
 
 const nav = [
-  { to: "/admin", label: "Overview" },
+  { to: "/admin/dashboard", label: "Overview" },
   { to: "/admin/events", label: "Manage Events" },
   { to: "/admin/members", label: "Members" },
   { to: "/admin/gallery", label: "Gallery" },

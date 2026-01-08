@@ -25,10 +25,21 @@ const itemVariants = {
   },
 };
 
+type MemberFormData = {
+  name: string;
+  skills: string;
+  github: string;
+  email: string;
+  phone: string;
+  course: string;
+  year: string;
+};
+
 export default function MembersAdmin() {
-  const { members, addMember } = useMembers();
+  const { members, addMember, updateMember, deleteMember, loading } = useMembers();
   const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [formData, setFormData] = useState<MemberFormData>({
     name: "",
     skills: "",
     github: "",
@@ -60,10 +71,7 @@ export default function MembersAdmin() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate()) return;
-    addMember(formData);
+  const resetForm = () => {
     setFormData({
       name: "",
       skills: "",
@@ -73,20 +81,49 @@ export default function MembersAdmin() {
       course: "",
       year: "",
     });
+    setErrors({});
+    setEditingId(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    if (editingId) {
+      await updateMember(editingId, formData);
+    } else {
+      await addMember(formData);
+    }
+
+    resetForm();
     setShowForm(false);
   };
 
   const handleCancel = () => {
-    setFormData({
-      name: "",
-      skills: "",
-      github: "",
-      email: "",
-      phone: "",
-      course: "",
-      year: "",
-    });
+    resetForm();
     setShowForm(false);
+  };
+
+  const handleEdit = (member: any) => {
+    setFormData({
+      name: member.name || "",
+      skills: member.skills || "",
+      github: member.github || "",
+      email: member.email || "",
+      phone: member.phone || "",
+      course: member.course || "",
+      year: member.year || "",
+    });
+    setEditingId(member._id || String(member.id));
+    setShowForm(true);
+  };
+
+  const handleDelete = async (id: string) => {
+    await deleteMember(id);
+    if (editingId === id) {
+      resetForm();
+      setShowForm(false);
+    }
   };
 
   return (
@@ -99,7 +136,7 @@ export default function MembersAdmin() {
       <motion.div variants={itemVariants} className="flex items-center justify-between">
         <div>
           <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-            Members Management
+            Committee Members
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-2">
             Manage all club members and their information
@@ -132,7 +169,7 @@ export default function MembersAdmin() {
             className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 backdrop-blur-sm"
           >
             <h2 className="text-2xl font-bold mb-6 bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-              Add New Committee Member
+              {editingId ? "Edit Committee Member" : "Add New Committee Member"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-5">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -276,7 +313,16 @@ export default function MembersAdmin() {
         )}
       </AnimatePresence>
 
-      {members.length === 0 ? (
+      {loading ? (
+        <motion.div
+          variants={itemVariants}
+          className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center"
+        >
+          <p className="text-lg text-slate-500 dark:text-slate-400">
+            Loading members...
+          </p>
+        </motion.div>
+      ) : members.length === 0 ? (
         <motion.div
           variants={itemVariants}
           className="bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 border border-slate-200 dark:border-slate-800 rounded-3xl p-12 text-center"
@@ -305,7 +351,7 @@ export default function MembersAdmin() {
                     {member.name}
                   </h3>
                   <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-                    ID: {member.id}
+                    ID: {member._id || member.id}
                   </p>
                 </div>
                 <motion.div
@@ -338,11 +384,34 @@ export default function MembersAdmin() {
                   </p>
                 </div>
 
-                <div>
+                <div className="flex items-center justify-between">
                   <p className="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1">
                     Skills
                   </p>
                   <p className="text-sm">{member.skills || "Not specified"}</p>
+                </div>
+
+                <div className="flex items-center justify-between gap-3 pt-2">
+                  <div className="flex gap-2">
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleEdit(member)}
+                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors"
+                    >
+                      Edit
+                    </motion.button>
+                    <motion.button
+                      type="button"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => handleDelete(member._id || String(member.id))}
+                      className="px-3 py-1 rounded-lg text-xs font-semibold bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-colors"
+                    >
+                      Delete
+                    </motion.button>
+                  </div>
                 </div>
 
                 <div>

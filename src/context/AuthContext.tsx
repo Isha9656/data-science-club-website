@@ -1,75 +1,95 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { authAPI, setToken, removeToken } from "../utils/api";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
+import { authAPI, removeToken } from "../utils/api";
 
-type Role = "guest" | "member" | "admin";
+export type Role = "guest" | "member" | "admin";
 
-const AuthContext = createContext<any>(null);
+export interface AuthUser {
+  id: string;
+  name: string;
+  email: string;
+  role: Role;
+}
 
-export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<{ role: Role; id?: string; name?: string; email?: string }>({ role: "guest" });
-  const [loading, setLoading] = useState(true);
+interface AuthContextValue {
+  user: AuthUser | null;
+  loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => void;
+}
+
+const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+
+const AUTH_USER_KEY = "authUser";
+
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const initializeAuth = async () => {
+      const storedUser = localStorage.getItem(AUTH_USER_KEY);
       const token = localStorage.getItem("token");
-      const savedRole = localStorage.getItem("role") as Role;
-      
+
+      if (storedUser) {
+        try {
+          const parsed: AuthUser = JSON.parse(storedUser);
+          setUser(parsed);
+        } catch {
+          localStorage.removeItem(AUTH_USER_KEY);
+        }
+      }
+
       if (token) {
         try {
           const userData = await authAPI.getMe();
-          setUser({
-            role: userData.role || "member",
+          const normalizedUser: AuthUser = {
             id: userData._id || userData.id,
             name: userData.name,
             email: userData.email,
-          });
-        } catch (error) {
-          // Token invalid, clear it
+            role: (userData.role || "member") as Role,
+          };
+          setUser(normalizedUser);
+          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
+          localStorage.setItem("role", normalizedUser.role);
+        } catch {
           removeToken();
-          if (savedRole) {
-            setUser({ role: savedRole });
-          }
+          localStorage.removeItem(AUTH_USER_KEY);
+          localStorage.removeItem("role");
+          setUser(null);
         }
-      } else if (savedRole) {
-        setUser({ role: savedRole });
       }
+
       setLoading(false);
     };
 
-    checkAuth();
+    void initializeAuth();
   }, []);
 
-  const login = async (role?: Role, email?: string, password?: string) => {
-    try {
-      if (email && password) {
-        // API login
-        const response = await authAPI.login(email, password, role);
-        setUser({
-          role: response.user.role || "member",
-          id: response.user.id,
-          name: response.user.name,
-          email: response.user.email,
-        });
-        return response;
-      } else if (role) {
-        // Demo login (backward compatibility)
-        localStorage.setItem("role", role);
-        setUser({ role });
-        // Also create a demo token for API calls
-        if (role !== "guest") {
-          const demoResponse = await authAPI.login("", "", role);
-          return demoResponse;
-        }
-      }
-    } catch (error: any) {
-      throw new Error(error.message || "Login failed");
-    }
+  const login = async (email: string, password: string) => {
+    const response = await authAPI.login(email, password);
+    const normalizedUser: AuthUser = {
+      id: response.user.id,
+      name: response.user.name,
+      email: response.user.email,
+      role: (response.user.role || "member") as Role,
+    };
+
+    setUser(normalizedUser);
+    localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
+    localStorage.setItem("role", normalizedUser.role);
   };
 
   const logout = () => {
     removeToken();
+    localStorage.removeItem(AUTH_USER_KEY);
     localStorage.removeItem("role");
-    setUser({ role: "guest" });
+    setUser(null);
   };
 
   return (
@@ -77,6 +97,14 @@ export const AuthProvider = ({ children }: any) => {
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth(): AuthContextValue {
+  const ctx = useContext(AuthContext);
+  if (!ctx) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return ctx;
+}
+
+

@@ -30,8 +30,8 @@ export const ProfileProvider = ({ children }: any) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (user.role !== "guest" && user.id) {
-      loadProfile();
+    if (user && user.role !== "guest" && user.id) {
+      void loadProfile();
     } else {
       setLoading(false);
     }

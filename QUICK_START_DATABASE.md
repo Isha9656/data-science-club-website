@@ -137,3 +137,4 @@ Start adding members, events, and achievements through your application!
 For detailed information, see [DATABASE_MANAGEMENT.md](./DATABASE_MANAGEMENT.md)
 
 
+

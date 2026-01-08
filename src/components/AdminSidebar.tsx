@@ -8,7 +8,7 @@ export default function AdminSidebar() {
       </h2>
 
       <nav className="flex flex-col gap-4">
-        <Link className="hover:text-cyan-500" to="/admin">
+        <Link className="hover:text-cyan-500" to="/admin/dashboard">
           Dashboard
         </Link>
         <Link className="hover:text-cyan-500" to="/admin/events">

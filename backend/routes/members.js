@@ -42,14 +42,9 @@ router.post('/', auth, adminAuth, async (req, res) => {
   }
 });
 
-// Update member
-router.put('/:id', auth, async (req, res) => {
+// Update member (admin only)
+router.put('/:id', auth, adminAuth, async (req, res) => {
   try {
-    // Users can only update their own profile unless they're admin
-    if (req.user.role !== 'admin' && req.user._id.toString() !== req.params.id) {
-      return res.status(403).json({ message: 'Access denied' });
-    }
-
     const member = await User.findByIdAndUpdate(
       req.params.id,
       { ...req.body, password: undefined }, // Don't allow password update here
@@ -80,5 +75,6 @@ router.delete('/:id', auth, adminAuth, async (req, res) => {
 });
 
 module.exports = router;
+
 
 

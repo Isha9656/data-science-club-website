@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Members from "./pages/public/Members";
@@ -28,6 +28,7 @@ import AchievementsAdmin from "./pages/admin/AchievementsAdmin";
 
 // Auth
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 export default function App() {
   return (
@@ -38,11 +39,11 @@ export default function App() {
       <Route path="/members" element={<Members />} />
       <Route path="/events" element={<Events />} />
 
-      {/* Member */}
+      {/* Member Dashboard */}
       <Route
-        path="/app"
+        path="/dashboard"
         element={
-          <ProtectedRoute role="member">
+          <ProtectedRoute>
             <MemberLayout />
           </ProtectedRoute>
         }
@@ -61,12 +62,13 @@ export default function App() {
       <Route
         path="/admin"
         element={
-          <ProtectedRoute role="admin">
+          <AdminRoute>
             <AdminLayout />
-          </ProtectedRoute>
+          </AdminRoute>
         }
       >
-        <Route index element={<AdminDashboard />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="events" element={<EventsAdmin />} />
         <Route path="members" element={<MembersAdmin />} />
         <Route path="gallery" element={<Gallery />} />

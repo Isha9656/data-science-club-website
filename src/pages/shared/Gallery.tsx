@@ -95,7 +95,7 @@ export default function Gallery() {
             Explore our events and festival memories
           </p>
         </div>
-        {user.role === "admin" && (
+        {user && user.role === "admin" && (
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -210,7 +210,7 @@ export default function Gallery() {
                       {item.category}
                     </span>
                   </div>
-                  {user.role === "admin" && (
+                  {user && user.role === "admin" && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
