@@ -151,30 +151,87 @@ export const achievementsAPI = {
 // Profile API
 export const profileAPI = {
   getMe: async () => {
-    return apiRequest<any>('/profile');
+    return apiRequest<any>('/profile/me');
   },
   update: async (profile: any) => {
-    return apiRequest<any>('/profile', {
+    return apiRequest<any>('/profile/me', {
       method: 'PUT',
       body: JSON.stringify(profile),
     });
   },
 };
 
-// Gallery API
-export const galleryAPI = {
-  getAll: async (category?: string) => {
-    const query = category ? `?category=${category}` : '';
-    return apiRequest<any[]>(`/gallery${query}`);
+// Auth additional APIs
+export const authAPIAdditional = {
+  forgotPassword: async (email: string) => {
+    return apiRequest<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
   },
-  create: async (item: { title: string; imageUrl: string; category: string; date?: Date }) => {
-    return apiRequest<any>('/gallery', {
+  verifyOTP: async (email: string, otp: string, newPassword: string) => {
+    return apiRequest<{ message: string }>('/auth/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ email, otp, newPassword }),
+    });
+  },
+  changePassword: async (currentPassword: string, newPassword: string) => {
+    return apiRequest<{ message: string }>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+};
+
+// Committee API
+export const committeeAPI = {
+  getAll: async () => {
+    return apiRequest<any[]>('/committee');
+  },
+  getById: async (id: string) => {
+    return apiRequest<any>(`/committee/${id}`);
+  },
+  create: async (member: any) => {
+    return apiRequest<any>('/committee', {
+      method: 'POST',
+      body: JSON.stringify(member),
+    });
+  },
+  update: async (id: string, member: any) => {
+    return apiRequest<any>(`/committee/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(member),
+    });
+  },
+  delete: async (id: string) => {
+    return apiRequest<{ message: string }>(`/committee/${id}`, {
+      method: 'DELETE',
+    });
+  },
+};
+
+// Event Gallery API
+export const eventGalleryAPI = {
+  getAll: async () => {
+    return apiRequest<any[]>('/event-gallery');
+  },
+  getById: async (id: string) => {
+    return apiRequest<any>(`/event-gallery/${id}`);
+  },
+  create: async (item: { title: string; description?: string; imageUrl: string; eventId?: string }) => {
+    return apiRequest<any>('/event-gallery', {
       method: 'POST',
       body: JSON.stringify(item),
     });
   },
+  update: async (id: string, item: any) => {
+    return apiRequest<any>(`/event-gallery/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(item),
+    });
+  },
   delete: async (id: string) => {
-    return apiRequest<{ message: string }>(`/gallery/${id}`, {
+    return apiRequest<{ message: string }>(`/event-gallery/${id}`, {
       method: 'DELETE',
     });
   },

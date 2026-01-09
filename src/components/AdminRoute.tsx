@@ -23,11 +23,22 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
+  if (user.mustChangePassword) {
+    return <Navigate to="/change-password" replace />;
+  }
+
   if (user.role !== "admin") {
-    return <Navigate to="/dashboard" replace />;
+    if (user.role === "committee") {
+      return <Navigate to="/committee/dashboard" replace />;
+    }
+    if (user.role === "member") {
+      return <Navigate to="/dashboard" replace />;
+    }
+    return <Navigate to="/login" replace />;
   }
 
   return children;
 }
+
 
 

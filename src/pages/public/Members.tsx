@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
-import { useMembers } from "../../context/MembersContext";
+import { useState, useEffect } from "react";
+import { committeeAPI } from "../../utils/api";
 import PublicNavbar from "../../components/PublicNavbar";
 
 const containerVariants = {
@@ -24,7 +25,22 @@ const itemVariants = {
 };
 
 export default function Members() {
-  const { members } = useMembers();
+  const [committeeMembers, setCommitteeMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadCommittee = async () => {
+      try {
+        const data = await committeeAPI.getAll();
+        setCommitteeMembers(data);
+      } catch (error) {
+        console.error("Failed to load committee members:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCommittee();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-white dark:from-slate-950 dark:to-slate-900 text-slate-900 dark:text-slate-200">
@@ -46,11 +62,26 @@ export default function Members() {
           </p>
         </motion.div>
 
-        <motion.div
-          variants={itemVariants}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-        >
-          {members.map((m: any, index: number) => (
+        {loading ? (
+          <motion.div
+            variants={itemVariants}
+            className="text-center py-20 text-slate-500"
+          >
+            Loading committee members...
+          </motion.div>
+        ) : committeeMembers.length === 0 ? (
+          <motion.div
+            variants={itemVariants}
+            className="text-center py-20 text-slate-500"
+          >
+            No committee members found.
+          </motion.div>
+        ) : (
+          <motion.div
+            variants={itemVariants}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+          >
+            {committeeMembers.map((m: any, index: number) => (
             <motion.div
               key={m.id}
               variants={itemVariants}
@@ -84,8 +115,9 @@ export default function Members() {
                 View GitHub →
               </a>
             </motion.div>
-          ))}
-        </motion.div>
+            ))}
+          </motion.div>
+        )}
       </motion.div>
     </div>
   );

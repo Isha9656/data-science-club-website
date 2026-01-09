@@ -7,13 +7,14 @@ import {
 } from "react";
 import { authAPI, removeToken } from "../utils/api";
 
-export type Role = "guest" | "member" | "admin";
+export type Role = "guest" | "member" | "committee" | "admin";
 
 export interface AuthUser {
   id: string;
   name: string;
   email: string;
   role: Role;
+  mustChangePassword?: boolean;
 }
 
 interface AuthContextValue {
@@ -78,11 +79,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       name: response.user.name,
       email: response.user.email,
       role: (response.user.role || "member") as Role,
+      mustChangePassword: response.user.mustChangePassword || false,
     };
 
     setUser(normalizedUser);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
     localStorage.setItem("role", normalizedUser.role);
+    
+    return normalizedUser;
   };
 
   const logout = () => {
@@ -106,5 +110,6 @@ export function useAuth(): AuthContextValue {
   }
   return ctx;
 }
+
 
 

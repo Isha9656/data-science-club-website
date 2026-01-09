@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
-import { useMembers } from "../../context/MembersContext";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { committeeAPI } from "../../utils/api";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -36,7 +35,8 @@ type MemberFormData = {
 };
 
 export default function MembersAdmin() {
-  const { members, addMember, updateMember, deleteMember, loading } = useMembers();
+  const [members, setMembers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [formData, setFormData] = useState<MemberFormData>({
@@ -49,6 +49,52 @@ export default function MembersAdmin() {
     year: "",
   });
   const [errors, setErrors] = useState<any>({});
+  const [submitLoading, setSubmitLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [apiError, setApiError] = useState("");
+
+  useEffect(() => {
+    loadMembers();
+  }, []);
+
+  const loadMembers = async () => {
+    try {
+      setLoading(true);
+      const data = await committeeAPI.getAll();
+      setMembers(data);
+    } catch (error) {
+      console.error("Failed to load committee members:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addMember = async (member: MemberFormData) => {
+    const response = await committeeAPI.create(member);
+    const { message, ...memberData } = response;
+    setMembers([...members, memberData]);
+    return response;
+  };
+
+  const updateMember = async (id: string, member: MemberFormData) => {
+    try {
+      const updated = await committeeAPI.update(id, member);
+      setMembers(members.map(m => (m._id === id || m.id === id ? updated : m)));
+    } catch (error) {
+      console.error("Failed to update member:", error);
+      throw error;
+    }
+  };
+
+  const deleteMember = async (id: string) => {
+    try {
+      await committeeAPI.delete(id);
+      setMembers(members.filter(m => m._id !== id && m.id !== id));
+    } catch (error) {
+      console.error("Failed to delete member:", error);
+      throw error;
+    }
+  };
 
   const validate = () => {
     const newErrors: any = {};
@@ -63,9 +109,17 @@ export default function MembersAdmin() {
         newErrors.name = "Name must contain only letters";
     }
 
-    if (formData.email && !emailRegex.test(formData.email)) newErrors.email = "Email must be from marwadiuniversity.ac.in";
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email)) {
+      newErrors.email = "Email must be from marwadiuniversity.ac.in";
+    }
     if (formData.phone && !phoneRegex.test(formData.phone)) newErrors.phone = "Phone must be exactly 10 digits";
-    if (formData.github && !urlRegex.test(formData.github)) newErrors.github = "Invalid URL (must start with http/https)";
+    if (!formData.github.trim()) {
+      newErrors.github = "GitHub URL is required";
+    } else if (!urlRegex.test(formData.github)) {
+      newErrors.github = "Invalid URL (must start with http/https)";
+    }
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -89,14 +143,33 @@ export default function MembersAdmin() {
     e.preventDefault();
     if (!validate()) return;
 
-    if (editingId) {
-      await updateMember(editingId, formData);
-    } else {
-      await addMember(formData);
-    }
+    setSubmitLoading(true);
+    setSuccessMessage("");
+    setApiError("");
 
-    resetForm();
-    setShowForm(false);
+    try {
+      if (editingId) {
+        await updateMember(editingId, formData);
+        setSuccessMessage("Committee member updated successfully.");
+      } else {
+        const response = await addMember(formData);
+        if (response && response.message) {
+          setSuccessMessage(response.message);
+        } else {
+          setSuccessMessage("Committee member created. Temporary password has been sent to email.");
+        }
+      }
+      resetForm();
+      setTimeout(() => {
+        setShowForm(false);
+        setSuccessMessage("");
+      }, 3000);
+    } catch (error: any) {
+      setApiError(error.message || "Failed to save member. Please try again.");
+      console.error("Failed to save member:", error);
+    } finally {
+      setSubmitLoading(false);
+    }
   };
 
   const handleCancel = () => {
@@ -119,10 +192,16 @@ export default function MembersAdmin() {
   };
 
   const handleDelete = async (id: string) => {
-    await deleteMember(id);
-    if (editingId === id) {
-      resetForm();
-      setShowForm(false);
+    if (window.confirm("Are you sure you want to delete this committee member?")) {
+      try {
+        await deleteMember(id);
+        if (editingId === id) {
+          resetForm();
+          setShowForm(false);
+        }
+      } catch (error) {
+        console.error("Failed to delete member:", error);
+      }
     }
   };
 
@@ -193,10 +272,11 @@ export default function MembersAdmin() {
                 </div>
                 <div>
                   <label className="block text-sm text-slate-600 dark:text-slate-400 mb-2 font-medium">
-                    Email
+                    Email *
                   </label>
                   <input
                     type="email"
+                    required
                     value={formData.email}
                     onChange={(e) => {
                       setFormData({ ...formData, email: e.target.value });
@@ -233,6 +313,7 @@ export default function MembersAdmin() {
                   </label>
                   <input
                     type="url"
+                    required
                     value={formData.github}
                     onChange={(e) => {
                       setFormData({ ...formData, github: e.target.value });
@@ -289,14 +370,25 @@ export default function MembersAdmin() {
                   placeholder="Python, Machine Learning, SQL, Power BI..."
                 />
               </div>
+              {successMessage && (
+                <div className="bg-green-500/10 border border-green-500/50 rounded-xl p-3 text-green-400 text-sm">
+                  {successMessage}
+                </div>
+              )}
+              {apiError && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-3 text-red-400 text-sm">
+                  {apiError}
+                </div>
+              )}
               <div className="flex gap-4">
                 <motion.button
                   type="submit"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all"
+                  disabled={submitLoading}
+                  whileHover={{ scale: submitLoading ? 1 : 1.05 }}
+                  whileTap={{ scale: submitLoading ? 1 : 0.95 }}
+                  className="bg-gradient-to-r from-cyan-500 to-blue-500 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Add Member
+                  {submitLoading ? "Processing..." : editingId ? "Update Member" : "Add Member"}
                 </motion.button>
                 <motion.button
                   type="button"

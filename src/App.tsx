@@ -29,6 +29,16 @@ import AchievementsAdmin from "./pages/admin/AchievementsAdmin";
 // Auth
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+import CommitteeRoute from "./components/CommitteeRoute";
+import ForgotPassword from "./pages/ForgotPassword";
+import ChangePassword from "./pages/ChangePassword";
+
+// Committee
+import CommitteeLayout from "./layouts/CommitteeLayout";
+import CommitteeDashboard from "./pages/committee/CommitteeDashboard";
+import EventsCommittee from "./pages/committee/EventsCommittee";
+import GalleryCommittee from "./pages/committee/GalleryCommittee";
+import AchievementsCommittee from "./pages/committee/AchievementsCommittee";
 
 export default function App() {
   return (
@@ -36,6 +46,8 @@ export default function App() {
       {/* Public */}
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/members" element={<Members />} />
       <Route path="/events" element={<Events />} />
 
@@ -56,6 +68,22 @@ export default function App() {
         <Route path="directory" element={<Directory />} />
         <Route path="analytics" element={<Analytics />} />
         <Route path="gallery" element={<Gallery />} />
+      </Route>
+
+      {/* Committee */}
+      <Route
+        path="/committee"
+        element={
+          <CommitteeRoute>
+            <CommitteeLayout />
+          </CommitteeRoute>
+        }
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<CommitteeDashboard />} />
+        <Route path="events" element={<EventsCommittee />} />
+        <Route path="gallery" element={<GalleryCommittee />} />
+        <Route path="achievements" element={<AchievementsCommittee />} />
       </Route>
 
       {/* Admin */}

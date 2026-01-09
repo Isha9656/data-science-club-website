@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['member', 'admin'],
+    enum: ['member', 'committee', 'admin'],
     default: 'member'
   },
   skills: {
@@ -48,6 +48,18 @@ const userSchema = new mongoose.Schema({
   photo: {
     type: String,
     default: ''
+  },
+  mustChangePassword: {
+    type: Boolean,
+    default: false
+  },
+  otp: {
+    type: String,
+    default: null
+  },
+  otpExpiry: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true
@@ -69,6 +81,7 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
 };
 
 module.exports = mongoose.model('User', userSchema);
+
 
 
 

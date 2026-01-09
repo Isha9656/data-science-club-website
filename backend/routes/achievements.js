@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Achievement = require('../models/Achievement');
-const { auth, adminAuth } = require('../middleware/auth');
+const { auth, committeeAuth } = require('../middleware/auth');
 
 // Get all achievements (public)
 router.get('/', async (req, res) => {
@@ -44,8 +44,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create achievement (admin only)
-router.post('/', auth, adminAuth, async (req, res) => {
+// Create achievement (admin or committee)
+router.post('/', auth, committeeAuth, async (req, res) => {
   try {
     const achievement = new Achievement({
       ...req.body,
@@ -60,8 +60,8 @@ router.post('/', auth, adminAuth, async (req, res) => {
   }
 });
 
-// Update achievement (admin only)
-router.put('/:id', auth, adminAuth, async (req, res) => {
+// Update achievement (admin or committee)
+router.put('/:id', auth, committeeAuth, async (req, res) => {
   try {
     const achievement = await Achievement.findByIdAndUpdate(
       req.params.id,
@@ -81,8 +81,8 @@ router.put('/:id', auth, adminAuth, async (req, res) => {
   }
 });
 
-// Delete achievement (admin only)
-router.delete('/:id', auth, adminAuth, async (req, res) => {
+// Delete achievement (admin or committee)
+router.delete('/:id', auth, committeeAuth, async (req, res) => {
   try {
     const achievement = await Achievement.findByIdAndDelete(req.params.id);
     if (!achievement) {
@@ -95,6 +95,7 @@ router.delete('/:id', auth, adminAuth, async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

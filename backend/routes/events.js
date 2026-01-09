@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Event = require('../models/Event');
-const { auth, adminAuth } = require('../middleware/auth');
+const { auth, committeeAuth } = require('../middleware/auth');
 
 // Get all events (public)
 router.get('/', async (req, res) => {
@@ -29,8 +29,8 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Create event (admin only)
-router.post('/', auth, adminAuth, async (req, res) => {
+// Create event (admin or committee)
+router.post('/', auth, committeeAuth, async (req, res) => {
   try {
     const event = new Event({
       ...req.body,
@@ -44,8 +44,8 @@ router.post('/', auth, adminAuth, async (req, res) => {
   }
 });
 
-// Update event (admin only)
-router.put('/:id', auth, adminAuth, async (req, res) => {
+// Update event (admin or committee)
+router.put('/:id', auth, committeeAuth, async (req, res) => {
   try {
     const event = await Event.findByIdAndUpdate(
       req.params.id,
@@ -63,8 +63,8 @@ router.put('/:id', auth, adminAuth, async (req, res) => {
   }
 });
 
-// Delete event (admin only)
-router.delete('/:id', auth, adminAuth, async (req, res) => {
+// Delete event (admin or committee)
+router.delete('/:id', auth, committeeAuth, async (req, res) => {
   try {
     const event = await Event.findByIdAndDelete(req.params.id);
     if (!event) {
@@ -77,6 +77,7 @@ router.delete('/:id', auth, adminAuth, async (req, res) => {
 });
 
 module.exports = router;
+
 
 
 

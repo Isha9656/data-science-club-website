@@ -52,17 +52,28 @@ export default function Login() {
     if (!userType) return;
 
     setLoading(true);
-    const role = userType === "committee" ? "admin" : "member";
     
     try {
+      let role = "member";
+      if (userType === "committee") {
+        role = "committee";
+      }
+
       if (mode === "signup") {
         await authAPI.register(formData.name, formData.email, formData.password, role);
       }
 
-      await login(formData.email, formData.password);
+      const loggedInUser = await login(formData.email, formData.password);
+      
+      if (loggedInUser.mustChangePassword) {
+        navigate("/change-password");
+        return;
+      }
 
-      if (role === "admin") {
+      if (loggedInUser.role === "admin") {
         navigate("/admin/dashboard");
+      } else if (loggedInUser.role === "committee") {
+        navigate("/committee/dashboard");
       } else {
         navigate("/dashboard");
       }
@@ -342,6 +353,13 @@ export default function Login() {
                   {apiError}
                 </div>
               )}
+
+              <Link
+                to="/forgot-password"
+                className="block text-center text-cyan-400 hover:text-cyan-300 text-sm"
+              >
+                Forgot Password?
+              </Link>
 
               <motion.button
                 type="submit"

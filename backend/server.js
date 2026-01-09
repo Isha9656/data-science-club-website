@@ -19,9 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/members', require('./routes/members'));
+app.use('/api/committee', require('./routes/committee'));
 app.use('/api/events', require('./routes/events'));
 app.use('/api/achievements', require('./routes/achievements'));
 app.use('/api/profile', require('./routes/profile'));
+app.use('/api/event-gallery', require('./routes/eventGallery'));
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -39,6 +41,7 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
 
 
 

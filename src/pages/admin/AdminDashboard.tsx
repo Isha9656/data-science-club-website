@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { useEvents } from "../../context/EventContext";
 import { useAchievements } from "../../context/AchievementContext";
-import { useMembers } from "../../context/MembersContext";
+import { useState, useEffect } from "react";
+import { committeeAPI } from "../../utils/api";
 import { Link } from "react-router-dom";
 
 const containerVariants = {
@@ -28,7 +29,19 @@ const itemVariants = {
 export default function AdminDashboard() {
   const { events } = useEvents();
   const { achievements } = useAchievements();
-  const { members } = useMembers();
+  const [committeeCount, setCommitteeCount] = useState(0);
+
+  useEffect(() => {
+    const loadCommittee = async () => {
+      try {
+        const data = await committeeAPI.getAll();
+        setCommitteeCount(data.length);
+      } catch (error) {
+        console.error("Failed to load committee:", error);
+      }
+    };
+    loadCommittee();
+  }, []);
 
   return (
     <motion.div
@@ -39,7 +52,7 @@ export default function AdminDashboard() {
     >
       <motion.div variants={itemVariants}>
         <h1 className="text-5xl font-black tracking-tight bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-400 bg-clip-text text-transparent">
-          Committee Dashboard
+          Admin Dashboard
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-2 text-lg">
           Manage and monitor all club activities from here.
@@ -51,8 +64,8 @@ export default function AdminDashboard() {
         className="grid grid-cols-1 md:grid-cols-3 gap-6"
       >
         <Card
-          title="Total Members"
-          value={members.length}
+          title="Committee Members"
+          value={committeeCount}
           gradient="from-cyan-500 to-blue-500"
           icon="👥"
           delay={0.1}
@@ -92,7 +105,7 @@ export default function AdminDashboard() {
           />
           <ActionLink
             to="/admin/members"
-            label="Manage Members"
+            label="Manage Committee"
             icon="👥"
             gradient="from-purple-500 to-pink-500"
             delay={0.2}
