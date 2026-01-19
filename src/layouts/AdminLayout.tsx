@@ -4,12 +4,13 @@ import { useTheme } from "../context/ThemeContext";
 import logo from "../logo.png";
 
 const nav = [
-  { to: "/admin/dashboard", label: "Overview" },
-  { to: "/admin/events", label: "Manage Events" },
-  { to: "/admin/members", label: "Members" },
-  { to: "/admin/gallery", label: "Gallery" },
-  { to: "/admin/achievements", label: "Achievements" },
+  { to: "dashboard", label: "Overview" },
+  { to: "events", label: "Manage Events" },
+  { to: "members", label: "Members" },
+  { to: "gallery", label: "Gallery" },
+  { to: "achievements", label: "Achievements" },
 ];
+
 
 export default function AdminLayout() {
   const { logout } = useAuth();

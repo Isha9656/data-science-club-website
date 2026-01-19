@@ -4,11 +4,12 @@ import { useTheme } from "../context/ThemeContext";
 import logo from "../logo.png";
 
 const nav = [
-  { to: "/committee/dashboard", label: "Dashboard" },
-  { to: "/committee/events", label: "Events" },
-  { to: "/committee/gallery", label: "Gallery" },
-  { to: "/committee/achievements", label: "Achievements" },
+  { to: "dashboard", label: "Dashboard" },
+  { to: "events", label: "Events" },
+  { to: "gallery", label: "Gallery" },
+  { to: "achievements", label: "Achievements" },
 ];
+
 
 export default function CommitteeLayout() {
   const { logout, user } = useAuth();
