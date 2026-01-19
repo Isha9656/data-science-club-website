@@ -1,52 +1,45 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
 
 const auth = async (req, res, next) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const authHeader = req.header("Authorization");
+    const token = authHeader?.startsWith("Bearer ")
+      ? authHeader.replace("Bearer ", "")
+      : null;
 
     if (!token) {
-      return res.status(401).json({ message: 'No token, authorization denied' });
+      return res.status(401).json({ message: "No token provided" });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
-    const user = await User.findById(decoded.userId).select('-password');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.userId).select("-password");
 
     if (!user) {
-      return res.status(401).json({ message: 'Token is not valid' });
+      return res.status(401).json({ message: "User not found" });
     }
 
     req.user = user;
     next();
   } catch (error) {
-    res.status(401).json({ message: 'Token is not valid' });
+    console.error("Auth middleware error:", error.message);
+    return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
 
-const adminAuth = async (req, res, next) => {
-  try {
-    if (req.user.role !== 'admin') {
-      return res.status(403).json({ message: 'Access denied. Admin only.' });
-    }
-    next();
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+const adminAuth = (req, res, next) => {
+  if (req.user.role !== "admin") {
+    return res.status(403).json({ message: "Admin access only" });
   }
+  next();
 };
 
-const committeeAuth = async (req, res, next) => {
-  try {
-    if (req.user.role !== 'admin' && req.user.role !== 'committee') {
-      return res.status(403).json({ message: 'Access denied. Admin or Committee only.' });
-    }
-    next();
-  } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+const committeeAuth = (req, res, next) => {
+  if (req.user.role !== "admin" && req.user.role !== "committee") {
+    return res.status(403).json({ message: "Committee access only" });
   }
+  next();
 };
 
 module.exports = { auth, adminAuth, committeeAuth };
-
-
-
-

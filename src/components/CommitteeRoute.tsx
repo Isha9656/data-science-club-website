@@ -1,19 +1,14 @@
-import { ReactElement } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-interface CommitteeRouteProps {
-  children: ReactElement;
-}
-
-export default function CommitteeRoute({ children }: CommitteeRouteProps) {
+export default function CommitteeRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-950 text-white">
         <div className="animate-pulse text-sm text-slate-400">
-          Loading...
+          Checking access...
         </div>
       </div>
     );
@@ -28,12 +23,8 @@ export default function CommitteeRoute({ children }: CommitteeRouteProps) {
   }
 
   if (user.role !== "admin" && user.role !== "committee") {
-    if (user.role === "member") {
-      return <Navigate to="/dashboard" replace />;
-    }
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
-  return children;
+  return <Outlet />;
 }
-

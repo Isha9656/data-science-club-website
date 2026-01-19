@@ -7,11 +7,15 @@ import {
 } from "react";
 import { authAPI, removeToken } from "../utils/api";
 
-export type Role = "guest" | "member" | "committee" | "admin";
+/* =========================
+   Types
+========================= */
+
+export type Role = "member" | "committee" | "admin";
 
 export interface AuthUser {
   id: string;
-  name: string;
+  name?: string;
   email: string;
   role: Role;
   mustChangePassword?: boolean;
@@ -20,27 +24,34 @@ export interface AuthUser {
 interface AuthContextValue {
   user: AuthUser | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<AuthUser>;
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextValue | undefined>(undefined);
+/* =========================
+   Context
+========================= */
+
+const AuthContext = createContext<AuthContextValue | null>(null);
 
 const AUTH_USER_KEY = "authUser";
 
+/* =========================
+   Provider
+========================= */
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = async () => {
+    const init = async () => {
       const storedUser = localStorage.getItem(AUTH_USER_KEY);
       const token = localStorage.getItem("token");
 
       if (storedUser) {
         try {
-          const parsed: AuthUser = JSON.parse(storedUser);
-          setUser(parsed);
+          setUser(JSON.parse(storedUser));
         } catch {
           localStorage.removeItem(AUTH_USER_KEY);
         }
@@ -53,39 +64,49 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             id: userData._id || userData.id,
             name: userData.name,
             email: userData.email,
-            role: (userData.role || "member") as Role,
+            role: userData.role,
+            mustChangePassword: userData.mustChangePassword ?? false,
           };
+
           setUser(normalizedUser);
-          localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
+          localStorage.setItem(
+            AUTH_USER_KEY,
+            JSON.stringify(normalizedUser)
+          );
           localStorage.setItem("role", normalizedUser.role);
-        } catch {
-          removeToken();
-          localStorage.removeItem(AUTH_USER_KEY);
-          localStorage.removeItem("role");
-          setUser(null);
-        }
+        } catch (err) {
+  console.error("Auth init failed:", err);
+  // ❗ DO NOT LOGOUT HERE
+  // Token may still be valid
+}
+
       }
 
       setLoading(false);
     };
 
-    void initializeAuth();
+    void init();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  /* =========================
+     LOGIN (FORCED TYPE)
+  ========================= */
+
+  const login: AuthContextValue["login"] = async (email, password) => {
     const response = await authAPI.login(email, password);
+
     const normalizedUser: AuthUser = {
       id: response.user.id,
       name: response.user.name,
       email: response.user.email,
-      role: (response.user.role || "member") as Role,
-      mustChangePassword: response.user.mustChangePassword || false,
+      role: response.user.role,
+      mustChangePassword: response.user.mustChangePassword ?? false,
     };
 
     setUser(normalizedUser);
     localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
     localStorage.setItem("role", normalizedUser.role);
-    
+
     return normalizedUser;
   };
 
@@ -103,13 +124,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+/* =========================
+   Hook
+========================= */
+
 export function useAuth(): AuthContextValue {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return ctx;
 }
-
-
-

@@ -1,12 +1,7 @@
-import { ReactElement } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-interface AdminRouteProps {
-  children: ReactElement;
-}
-
-export default function AdminRoute({ children }: AdminRouteProps) {
+export default function AdminRoute() {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -31,14 +26,8 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     if (user.role === "committee") {
       return <Navigate to="/committee/dashboard" replace />;
     }
-    if (user.role === "member") {
-      return <Navigate to="/dashboard" replace />;
-    }
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/dashboard" replace />;
   }
 
-  return children;
+  return <Outlet />;
 }
-
-
-
