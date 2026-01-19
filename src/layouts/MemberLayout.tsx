@@ -4,15 +4,16 @@ import { useTheme } from "../context/ThemeContext";
 import logo from "../logo.png";
 
 const navItems = [
-  { to: "/app", label: "Dashboard" },
-  { to: "/app/events", label: "Events" },
-  { to: "/app/achievements", label: "Achievements" },
-  { to: "/app/leaderboard", label: "Leaderboard" },
-  { to: "/app/profile", label: "Profile" },
-  { to: "/app/directory", label: "Directory" },
-  { to: "/app/gallery", label: "Gallery" },
-  { to: "/app/analytics", label: "Analytics" },
+  { to: ".", label: "Dashboard" },      // index route
+  { to: "events", label: "Events" },
+  { to: "achievements", label: "Achievements" },
+  { to: "leaderboard", label: "Leaderboard" },
+  { to: "profile", label: "Profile" },
+  { to: "directory", label: "Directory" },
+  { to: "gallery", label: "Gallery" },
+  { to: "analytics", label: "Analytics" },
 ];
+
 
 export default function MemberLayout() {
   const { logout } = useAuth();
@@ -20,7 +21,10 @@ export default function MemberLayout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isActive = (path: string) => location.pathname === path;
+const isActive = (path: string) =>
+  path === "."
+    ? location.pathname === "/dashboard"
+    : location.pathname.endsWith(path);
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-950 text-slate-900 dark:text-white flex transition-colors">
