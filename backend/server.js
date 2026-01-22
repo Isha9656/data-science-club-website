@@ -1,52 +1,62 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
+console.log("🔥 BACKEND SERVER.JS IS RUNNING");
+
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
+const connectDB = require("./config/db");
 const path = require("path");
 
-// Load environment variables
+// Load environment variables FIRST
 dotenv.config();
+
+// ---- TIME DEBUG (IMPORTANT FOR CLOUDINARY) ----
+console.log("Server local time:", new Date().toString());
+console.log("Server UTC time:", new Date().toISOString());
 
 // Connect to database
 connectDB();
 
 const app = express();
 
-// Middleware
+// ---- MIDDLEWARE ----
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/members', require('./routes/members'));
-app.use('/api/committee', require('./routes/committee'));
-app.use('/api/events', require('./routes/events'));
-app.use('/api/achievements', require('./routes/achievements'));
-app.use('/api/profile', require('./routes/profile'));
-app.use('/api/event-gallery', require('./routes/eventGallery'));
+// ---- STATIC FILES (if needed) ----
+app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
+
+// ---- ROUTES ----
+app.use("/api/auth", require("./routes/auth"));
+app.use("/api/members", require("./routes/members"));
+app.use("/api/committee", require("./routes/committee"));
+app.use("/api/events", require("./routes/events"));
+app.use("/api/achievements", require("./routes/achievements"));
+app.use("/api/profile", require("./routes/profile"));
+app.use("/api/event-gallery", require("./routes/eventGallery"));
 app.use("/api/upload", require("./routes/upload"));
 
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ message: 'Server is running', status: 'OK' });
+// ---- HEALTH CHECK ----
+app.get("/api/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Server is running",
+    timeUTC: new Date().toISOString(),
+  });
 });
 
-// Error handling middleware
+// ---- GLOBAL ERROR HANDLER (REAL ONE) ----
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ message: 'Something went wrong!', error: err.message });
+  console.error("ERROR:", err);
+  res.status(err.status || 500).json({
+    success: false,
+    message: err.message || "Internal Server Error",
+  });
 });
 
+// ---- START SERVER ----
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-// serve uploaded images
-app.use("/uploads", express.static(path.join(__dirname, "public/uploads")));
-
-
-
-

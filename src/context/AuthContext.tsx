@@ -57,30 +57,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      if (token) {
-        try {
-          const userData = await authAPI.getMe();
-          const normalizedUser: AuthUser = {
-            id: userData._id || userData.id,
-            name: userData.name,
-            email: userData.email,
-            role: userData.role,
-            mustChangePassword: userData.mustChangePassword ?? false,
-          };
-
-          setUser(normalizedUser);
-          localStorage.setItem(
-            AUTH_USER_KEY,
-            JSON.stringify(normalizedUser)
-          );
-          localStorage.setItem("role", normalizedUser.role);
-        } catch (err) {
-  console.error("Auth init failed:", err);
-  // ❗ DO NOT LOGOUT HERE
-  // Token may still be valid
+      if (!token) {
+  setLoading(false);
+  return;
 }
 
-      }
+try {
+  const userData = await authAPI.getMe();
+  const normalizedUser: AuthUser = {
+    id: userData._id || userData.id,
+    name: userData.name,
+    email: userData.email,
+    role: userData.role,
+    mustChangePassword: userData.mustChangePassword ?? false,
+  };
+
+  setUser(normalizedUser);
+  localStorage.setItem(AUTH_USER_KEY, JSON.stringify(normalizedUser));
+} catch (err) {
+  console.error("Failed to restore session", err);
+  // ❗ no logout here
+}
+
 
       setLoading(false);
     };

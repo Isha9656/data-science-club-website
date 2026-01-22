@@ -1,28 +1,76 @@
 const express = require("express");
 const multer = require("multer");
-const path = require("path");
+const cloudinary = require("../utils/cloudinary");
+const EventGallery = require("../models/EventGallery");
+const { auth, committeeAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "public/uploads");
-  },
-  filename: (req, file, cb) => {
-    cb(null, "committee-" + Date.now() + path.extname(file.originalname));
+// ---------- MULTER CONFIG ----------
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      return cb(new Error("Only image files allowed"), false);
+    }
+    cb(null, true);
   },
 });
 
-const upload = multer({ storage });
+// ---------- UPLOAD + SAVE ----------
+router.post(
+  "/committee",
+  auth,
+  committeeAuth,
+  upload.single("photo"),
+  async (req, res) => {
+    console.log("🚀 OPTION B UPLOAD ROUTE HIT");
 
-router.post("/committee", upload.single("photo"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: "No file uploaded" });
+    try {
+      const { title, description, eventId } = req.body;
+
+      if (!req.file) {
+        return res.status(400).json({ message: "Image is required" });
+      }
+      if (!title) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(
+        `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`,
+        { folder: "dsclub/event-gallery" }
+      );
+
+      console.log("☁️ Cloudinary OK");
+
+      // Save to MongoDB
+      const galleryItem = await EventGallery.create({
+        title,
+        description,
+        eventId: eventId || undefined,
+        imageUrl: result.secure_url,
+        publicId: result.public_id,
+        createdBy: req.user._id,
+      });
+
+      console.log("✅ SAVED TO MONGO:", galleryItem._id);
+
+      res.status(201).json(galleryItem);
+    } catch (error) {
+      console.error("❌ UPLOAD ERROR:", error);
+      res.status(500).json({ message: "Upload failed" });
+    }
   }
+);
 
-  res.json({
-    photoUrl: `/uploads/${req.file.filename}`,
-  });
+// ---------- MULTER ERROR HANDLER ----------
+router.use((err, req, res, next) => {
+  if (err) {
+    return res.status(400).json({ message: err.message });
+  }
+  next();
 });
 
 module.exports = router;
